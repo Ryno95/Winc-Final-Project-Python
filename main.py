@@ -27,50 +27,67 @@ class Sales:
         self.nettoSales = []
 
     def calculateSales(self):
-        # Rememeber to replace "self.products" with product when inplementing for loop
+        i = 0
         for product in self.products:
-            self.sales.append(
-                {
-                    "product": product["name"],
-                    "salesAmount": round(product["order_size"] * self.salesPercentage),
-                    "sell": product["sell"],
-                    "buy": product["buy"],
-                }
-            )
-            return self.sales
+            self.products[i] = {
+                "name": product["name"],
+                "salesAmount": round(product["stock"] * self.salesPercentage),
+                "stock": product["stock"]
+                - round(product["stock"] * self.salesPercentage),
+                "sell": product["sell"],
+                "buy": product["buy"],
+            }
+            i += 1
+        return self.products
 
     def calculateNetto(self):
-        for sale in self.sales:
-            # print(self.sales["salesAmount"])
-            bruto = sale["salesAmount"] * sale["sell"]
-            netto = bruto - (sale["salesAmount"] * sale["buy"])
+        for product in self.products:
+            bruto = round(product["salesAmount"] * product["sell"], 2)
+            netto = bruto - (product["salesAmount"] * product["buy"])
             self.nettoSales.append(
-                {"product": sale["product"], "bruto": bruto, "netto": netto}
+                {
+                    "name": product["name"],
+                    "stock": product["stock"],
+                    "bruto": bruto,
+                    "netto": netto,
+                }
             )
-            print(sale)
         return self.nettoSales
 
 
 # ------ Global variables and data ------- #
-allProducts = myData.products
-# oneProduct = allProducts[0]
-bussinessHours = {"open": "08", "close": "22"}
-# orderSize = oneProduct["order_size"]
+allProducts = [myData.products[0], myData.products[1]]
+AllProductsAllInfo = []
+for product in allProducts:
+    AllProductsAllInfo.append(
+        {
+            "name": product["name"],
+            "keeps_days": product["keeps_days"],
+            "buy": product["buy"],
+            "sell": product["sell"],
+            "salesAmount": 0,
+            "stock": product["stock"],
+            "order_size": product["order_size"],
+        }
+    )
+# print(AllProductsAllInfo)
+
+bussinessHours = {"open": "08", "close": "22", "hoursOpen": 4}
 
 
 # --------- Sales and profit ------------ #
 salesPercentage = random.randint(25, 75) / 100
-x = Sales(allProducts, salesPercentage)
+x = Sales(AllProductsAllInfo, salesPercentage)
 salesAmount = Sales.calculateSales(x)
-# brutoSales = salesAmount[0]["sales"] * oneProduct["sell"]
-# nettoSales = brutoSales - (salesAmount[0]["sales"] * oneProduct["buy"])
 
-# print(salesAmount[0]["sales"])
-# print(oneProduct["sell"])
+# print(allProducts)
+i = 1
+while i < bussinessHours["hoursOpen"]:
+    print(">>>>>>>>>>> List fo the sales: ", x.calculateSales())
+    print(">>>>>list for the Netto: ", x.calculateNetto())
+    #    print(f">>>>>> Netto Hours number :", x.calculateNetto())
+    i += 1
 
-# print(">>>>>>>>>BRUTOSALES", brutoSales)
-# print(">>>>>>>>>NETTO SALES", nettoSales)
-# print(oneProduct)
-print(allProducts)
-print(Sales.calculateNetto(x))
-# print(Sales.calculateSales(x))s
+
+# print(">>>>>> Sales:", Sales.calculateSales(x))
+# print(">>>>>> Netto:", Sales.calculateNetto(x))
